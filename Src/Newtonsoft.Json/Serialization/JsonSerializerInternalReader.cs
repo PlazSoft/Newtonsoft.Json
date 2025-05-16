@@ -801,6 +801,14 @@ namespace Newtonsoft.Json.Serialization
             {
                 StructMultiKey<string?, string> typeNameKey = ReflectionUtils.SplitFullyQualifiedTypeName(qualifiedTypeName);
 
+                // PlazSoft modified
+                if (AssemblyReplace.Hook != null)
+                {
+                    AssemblyReplace.Hook(ref typeName, ref assemblyName);
+                }
+                // End PlazSoft modified
+
+
                 Type specifiedType;
                 try
                 {

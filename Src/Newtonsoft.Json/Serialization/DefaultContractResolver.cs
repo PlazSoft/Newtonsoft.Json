@@ -1283,6 +1283,25 @@ namespace Newtonsoft.Json.Serialization
 
         internal static bool CanConvertToString(Type type)
         {
+            // observe a JsonNoToStringAttribute which disables converting ToString
+            AttributeCollection attribs = TypeDescriptor.GetAttributes(type);
+
+            for (int i = 0; i < attribs.Count; i++)
+            {
+                if (attribs[i] is JsonNoToStringAttribute)
+                {
+                    return false; // Disable converting to string
+                }
+            }
+
+#if !(NETFX_CORE || PORTABLE40 || PORTABLE)
+            TypeConverter converter = ConvertUtils.Convert(type);
+            // Don't use TypeConverters marked as not to be used by JSON.NET
+            if (converter is IJsonUnusedTypeConverter)
+            {
+                converter = null;
+            }
+
 #if HAVE_TYPE_DESCRIPTOR
             if (JsonTypeReflector.CanTypeDescriptorConvertString(type, out _))
             {
